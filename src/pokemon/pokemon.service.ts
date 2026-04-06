@@ -75,4 +75,8 @@ export class PokemonService {
     }
     return deletedPokemon;
   }
+
+  delete() {
+    return this.pokemonModel.deleteMany({});
+  }
 }
