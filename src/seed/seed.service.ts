@@ -3,23 +3,22 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Pokemon } from '../pokemon/entities/pokemon.entity';
 import { Model } from 'mongoose';
 import { PokemonAPIResponse } from './interfaces/pokemon-api.response';
+import { AxiosAdapter } from '../common/adapters/axios-adapter';
 
 @Injectable()
 export class SeedService {
 
   constructor(
     @InjectModel(Pokemon.name)
-    private readonly pokemonModel: Model<Pokemon>
+    private readonly pokemonModel: Model<Pokemon>,
+    private readonly http: AxiosAdapter
   ) {
 
   }
 
   async executeSeed() {
     await this.pokemonModel.deleteMany({});
-
-
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=650`);
-    const json: PokemonAPIResponse = await response.json();
+    const json = await this.http.get<PokemonAPIResponse>(`https://pokeapi.co/api/v2/pokemon?limit=650`);
     const { results = [] } = json;
     const bulkCreate: {name:string, no: number}[]= [];
     /*
